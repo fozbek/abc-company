@@ -19,6 +19,43 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
+    public function findByUserId($id): array
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.user = :id')
+            ->setParameter('id', $id)
+            ->orderBy('o.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function update($id, $data)
+    {
+        $order = $this->find($id);
+
+        $order->setQuantity($data['quantity']);
+        $order->setAddress($data['address']);
+
+        $this->_em->persist($order);
+        $this->_em->flush($order);
+    }
+
+    public function insert($data): Order
+    {
+        $order = new Order();
+
+        $order->setOrderCode($data['order_code']);
+        $order->setProduct($data['product']);
+        $order->setQuantity($data['quantity']);
+        $order->setAddress($data['address']);
+        $order->setUser($data['user']);
+
+        $this->_em->persist($order);
+        $this->_em->flush($order);
+
+        return $order;
+    }
+
     // /**
     //  * @return Order[] Returns an array of Order objects
     //  */
