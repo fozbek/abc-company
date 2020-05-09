@@ -64,11 +64,16 @@ class OrderController extends AbstractController
      */
     public function update(int $id, Request $request)
     {
+        $currentUser = $this->getUser();
+
         $em = $this->getDoctrine()->getManager();
         $orderRepository = $em->getRepository(Order::class);
-        $order = $orderRepository->find($id);
+        $order = $orderRepository->findOneBy([
+            'id' => $id,
+            'user' => $currentUser->getId()
+        ]);
 
-        if (empty($order) || !$this->getUser()->canAccessOrder($order)) {
+        if (empty($order)) {
             return $this->json([
                 'data' => [],
                 'message' => 'Order couldn\'t found',
