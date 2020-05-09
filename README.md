@@ -1,5 +1,5 @@
 # ABC-Company
-This project help you to manage products and orders. 
+This project helps you to manage products and orders. 
 Customers can manage their orders.
 
 ## Requirements
@@ -18,7 +18,7 @@ Container names should match. You may have configured container names. if you di
     docker exec abc-company_php-fpm_1 bin/console doctrine:migrations:migrate
     docker exec abc-company_php-fpm_1 bin/console doctrine:fixtures:load -n
     
-Generate .pem files. Password should be 'verysecurepassword' otherwise you should change it in lexik_jwt_authentication.yaml. Password is easy beacuse this project built for development purpose.
+Generate .pem files. Password should be 'verysecurepassword' otherwise you should change it in lexik_jwt_authentication.yaml. Password is easy beacuse this project is built for development purpose.
     
     mkdir -p config/jwt
     openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
