@@ -101,7 +101,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/api/order", methods={"PUT"}, name="order_store")
      */
-    public function storeAction(Request $request)
+    public function store(Request $request)
     {
         $productId = $request->get('product_id');
         $productRepository = $this->getDoctrine()->getRepository(Product::class);
