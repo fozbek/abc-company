@@ -37,7 +37,7 @@ class OrderRepository extends ServiceEntityRepository
         $order->setAddress($data['address']);
 
         $this->_em->persist($order);
-        $this->_em->flush($order);
+        $this->_em->flush();
     }
 
     public function insert($data): Order
@@ -51,7 +51,7 @@ class OrderRepository extends ServiceEntityRepository
         $order->setUser($data['user']);
 
         $this->_em->persist($order);
-        $this->_em->flush($order);
+        $this->_em->flush();
 
         return $order;
     }
