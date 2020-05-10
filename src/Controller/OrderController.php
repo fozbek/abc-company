@@ -6,6 +6,7 @@ use App\Entity\Order;
 use App\Entity\Product;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -21,7 +22,7 @@ class OrderController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $orders = $em->getRepository(Order::class)->findByUserId($userId);
 
-        $statusCode = count($orders) ? 200 : 204;
+        $statusCode = count($orders) ? Response::HTTP_OK : Response::HTTP_NO_CONTENT;
 
         return $this->json([
             'data' => $orders,
@@ -48,19 +49,19 @@ class OrderController extends AbstractController
             return $this->json([
                 'data' => [],
                 'message' => 'Order couldn\'t found',
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         return $this->json([
             'data' => $order,
             'message' => 'ok',
-        ], 200, [], [
+        ], Response::HTTP_OK, [], [
             AbstractNormalizer::GROUPS => 'normal'
         ]);
     }
 
     /**
-     * @Route("/api/order/{id}", methods={"POST"}, name="order_update")
+     * @Route("/api/order/{id}", methods={"PUT"}, name="order_update")
      */
     public function update(int $id, Request $request)
     {
@@ -77,14 +78,14 @@ class OrderController extends AbstractController
             return $this->json([
                 'data' => [],
                 'message' => 'Order couldn\'t found',
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         if (!empty($order->getShippingDate())) {
             return $this->json([
                 'data' => [],
                 'message' => 'Order has shipped',
-            ], 406);
+            ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
         $orderRepository->update($id, [
@@ -99,7 +100,7 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/api/order", methods={"PUT"}, name="order_store")
+     * @Route("/api/order", methods={"POST"}, name="order_store")
      */
     public function store(Request $request)
     {
@@ -111,7 +112,7 @@ class OrderController extends AbstractController
             return $this->json([
                 'data' => [],
                 'message' => 'Product couldn\'t found',
-            ], 404);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         $bytes = random_bytes(7);
@@ -129,7 +130,7 @@ class OrderController extends AbstractController
         return $this->json([
             'data' => $order,
             'message' => 'ok',
-        ], 200, [], [
+        ], Response::HTTP_CREATED, [], [
             AbstractNormalizer::GROUPS => 'normal'
         ]);
     }

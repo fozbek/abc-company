@@ -3,6 +3,8 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrderControllerTest extends WebTestCase
 {
@@ -24,34 +26,34 @@ class OrderControllerTest extends WebTestCase
     public function testStore()
     {
         $client = self::getClient();
-        $client->request('PUT', '/api/order');
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $client->request(Request::METHOD_POST, '/api/order');
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
 
         $client = $this->createAuthenticatedClient();
-        $client->request('PUT', '/api/order', [
+        $client->request(Request::METHOD_POST, '/api/order', [
             'quantity' => 15,
             'address' => 'somewhere in the world',
             'product_id' => 45674436464356, // a wrong product id
         ]);
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
 
         $client = $this->createAuthenticatedClient();
-        $client->request('PUT', '/api/order', [
+        $client->request(Request::METHOD_POST, '/api/order', [
             'quantity' => 15,
             'address' => 'somewhere in the world',
             'product_id' => $_ENV['VALID_PRODUCT_ID']
         ]);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
     }
 
     public function testDetail()
     {
         $client = self::getClient();
-        $client->request('GET', '/api/order/1');
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $client->request(Request::METHOD_GET, '/api/order/1');
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/order/' . $this->orderToSee['id']);
+        $client->request(Request::METHOD_GET, '/api/order/' . $this->orderToSee['id']);
 
         $order = json_decode($client->getResponse()->getContent(), true)['data'];
         $this->assertEquals($this->orderToSee, $order);
@@ -60,26 +62,26 @@ class OrderControllerTest extends WebTestCase
     public function testList()
     {
         $client = self::getClient();
-        $client->request('GET', '/api/order');
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $client->request(Request::METHOD_GET, '/api/order');
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/order');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $client->request(Request::METHOD_GET, '/api/order');
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
     }
 
     public function testUpdate()
     {
         $client = self::getClient();
-        $client->request('POST', '/api/order/' . $this->orderToUpdate['id']);
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $client->request(Request::METHOD_PUT, '/api/order/' . $this->orderToUpdate['id']);
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
 
         $client = $this->createAuthenticatedClient();
-        $client->request('POST', '/api/order/' . $this->orderToUpdate['id'], [
+        $client->request(Request::METHOD_PUT, '/api/order/' . $this->orderToUpdate['id'], [
             'quantity' => 15,
             'address' => 'new adress'
         ]);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
     }
 
     /**
@@ -92,7 +94,7 @@ class OrderControllerTest extends WebTestCase
     {
         $client = self::getClient();
         $client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/login_check',
             [],
             [],
@@ -120,7 +122,7 @@ class OrderControllerTest extends WebTestCase
     private function createOrderFor(&$order)
     {
         $client = $this->createAuthenticatedClient();
-        $client->request('PUT', '/api/order', [
+        $client->request(Request::METHOD_POST, '/api/order', [
             'quantity' => 3,
             'address' => 'valid order\'s address',
             'product_id' => $_ENV['VALID_PRODUCT_ID']
